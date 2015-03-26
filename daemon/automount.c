@@ -64,6 +64,7 @@ unsigned int global_selection_options;
 
 long global_negative_timeout = -1;
 int do_force_unlink = 0;		/* Forceably unlink mount tree at startup */
+unsigned int global_make_shared = 0;
 
 static int start_pipefd[2];
 static int st_stat = 1;
@@ -1834,6 +1835,8 @@ static void usage(void)
 		"			don't check if daemon is already running\n"
 		"	-F --force	forceably clean up known automounts at start\n"
 		"	-V --version	print version, build config and exit\n"
+		"	-S --hcc-make-shared\n"
+		"			make all autofs mounts MS_SHARED\n"
 		, program);
 }
 
@@ -2023,6 +2026,7 @@ int main(int argc, char *argv[])
 		{"set-log-priority", 1, 0, 'l'},
 		{"dont-check-daemon", 0, 0, 'C'},
 		{"force", 0, 0, 'F'},
+		{"hcc-make-shared", 0, 0, 'S'},
 		{0, 0, 0, 0}
 	};
 
@@ -2135,6 +2139,10 @@ int main(int argc, char *argv[])
 
 		case 'F':
 			do_force_unlink = 1;
+			break;
+
+		case 'S':
+			global_make_shared = 1;
 			break;
 
 		case '?':

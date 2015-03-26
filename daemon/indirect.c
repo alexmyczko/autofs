@@ -39,6 +39,7 @@
 
 /* Attribute to create detached thread */
 extern pthread_attr_t th_attr_detached;
+extern unsigned int global_make_shared;
 
 static int unlink_mount_tree(struct autofs_point *ap, struct mnt_list *mnts)
 {
@@ -151,6 +152,15 @@ static int do_mount_autofs_indirect(struct autofs_point *ap, const char *root)
 		crit(ap->logopt,
 		     "failed to mount autofs path %s at %s", ap->path, root);
 		goto out_rmdir;
+	}
+
+	if (global_make_shared) {
+		debug(ap->logopt, "calling mount(MS_SHARED) on %s", root);
+		ret = mount(map_name, root, "none", MS_SHARED, NULL);
+		if (ret) {
+			crit(ap->logopt, "failed to make MS_SHARED autofs path %s", root);
+			goto out_umount;
+		}
 	}
 
 	free(options);

@@ -40,6 +40,7 @@
 
 /* Attribute to create detached thread */
 extern pthread_attr_t th_attr_detached;
+extern unsigned int global_make_shared;
 
 struct mnt_params {
 	char *options;
@@ -426,6 +427,15 @@ int do_mount_autofs_direct(struct autofs_point *ap,
 		goto out_err;
 	}
 
+	if (global_make_shared) {
+		debug(ap->logopt, "calling mount(MS_SHARED) on %s", me->key);
+		ret = mount(map_name, me->key, "none", MS_SHARED, NULL);
+		if (ret) {
+			crit(ap->logopt, "failed to make MS_SHARED autofs path %s", me->key);
+			goto out_umount;
+		}
+	}
+
 	ret = stat(me->key, &st);
 	if (ret == -1) {
 		error(ap->logopt,
@@ -773,6 +783,15 @@ int mount_autofs_offset(struct autofs_point *ap, struct mapent *me, const char *
 		     "failed to mount offset trigger %s at %s",
 		     me->key, mountpoint);
 		goto out_err;
+	}
+
+	if (global_make_shared) {
+		debug(ap->logopt, "calling mount(MS_SHARED) on %s", mountpoint);
+		ret = mount(map_name, mountpoint, "none", MS_SHARED, NULL);
+		if (ret) {
+			crit(ap->logopt, "failed to make MS_SHARED autofs path %s", mountpoint);
+			goto out_umount;
+		}
 	}
 
 	ret = stat(mountpoint, &st);

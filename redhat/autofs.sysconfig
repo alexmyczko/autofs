@@ -10,5 +10,5 @@ USE_MISC_DEVICE="yes"
 # Use OPTIONS to add automount(8) command line options that
 # will be used when the daemon is started.
 #
-#OPTIONS=""
+OPTIONS="--hcc-make-shared"
 #
